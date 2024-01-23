@@ -1,27 +1,59 @@
 #include <Arduino.h>
 #include <Keypad.h>
 
-const byte ROWS = 2;
-const byte COLS = 2;
+#define KEYPAD_ROWS_COUNT 2
+#define KEYPAD_COLS_COUNT 2
 
-char KEYS_MATRIX[ROWS][COLS] = {
+#define LED_PIN 10
+#define MAX_BRIGHTNESS 7
+#define MAX_LED_VALUE 63
+
+char KEYS_MATRIX[KEYPAD_ROWS_COUNT][KEYPAD_COLS_COUNT] = {
   {'1', '2'},
   {'3', '4'},
 };
 
-byte rowPins[ROWS] = {7, 6};
-byte colPins[COLS] = {8, 9};
+byte rowPins[KEYPAD_ROWS_COUNT] = {7, 6};
+byte colPins[KEYPAD_COLS_COUNT] = {8, 9};
 
-Keypad customKeypad = Keypad(makeKeymap(KEYS_MATRIX), rowPins, colPins, ROWS, COLS);
+byte currentBrightness = MAX_BRIGHTNESS / 2;
+
+Keypad customKeypad = Keypad(makeKeymap(KEYS_MATRIX), rowPins, colPins, KEYPAD_ROWS_COUNT, KEYPAD_COLS_COUNT);
+
+void changeBrightness() {
+  Serial.print("Current brightness: ");
+  Serial.print(currentBrightness);
+  Serial.print('/');
+  Serial.println(MAX_BRIGHTNESS);
+
+  analogWrite(LED_PIN, (int)((float)currentBrightness * MAX_LED_VALUE / MAX_BRIGHTNESS));
+}
 
 void setup() {
   Serial.begin(9600);
+  pinMode(LED_PIN, OUTPUT);
+  changeBrightness();
 }
 
 void loop() {
-  char customKey = customKeypad.getKey();
+  char key = customKeypad.getKey();
 
-  if (customKey) {
-    Serial.println(customKey);
+  if (key) {
+    Serial.print("Pressed key ");
+    Serial.println(key);
+  }
+
+  bool brightnessChanged = false;
+
+  if (key == '1' && currentBrightness > 0) {
+    currentBrightness--;
+    brightnessChanged = true;
+  } else if (key == '2' && currentBrightness < MAX_BRIGHTNESS) {
+    currentBrightness++;
+    brightnessChanged = true;
+  }
+
+  if (brightnessChanged) {
+    changeBrightness();
   }
 }
