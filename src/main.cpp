@@ -17,9 +17,9 @@ char KEYS_MATRIX[KEYPAD_ROWS_COUNT][KEYPAD_COLS_COUNT] = {
   {'3', '4'},
 };
 
-byte rowPins[KEYPAD_ROWS_COUNT] = {4, 2};
-byte colPins[KEYPAD_COLS_COUNT] = {7, 8};
-byte ledPins[LED_COUNT] = {9, 6, 5, 3};
+byte rowPins[KEYPAD_ROWS_COUNT] = {48, 46};
+byte colPins[KEYPAD_COLS_COUNT] = {49, 47};
+byte ledPins[LED_COUNT] = {5, 4, 3, 2};
 
 byte currentBrightness = MAX_BRIGHTNESS / 2;
 byte currentLedIndex = 0;
@@ -27,7 +27,7 @@ byte currentLedIndex = 0;
 Keypad customKeypad = Keypad(makeKeymap(KEYS_MATRIX), rowPins, colPins, KEYPAD_ROWS_COUNT, KEYPAD_COLS_COUNT);
 
 void setBrightness() {
-  analogWrite(ledPins[currentLedIndex], (int)((float)currentBrightness * MAX_LED_VALUE / MAX_BRIGHTNESS));
+  analogWrite(ledPins[currentLedIndex], (int)(sq((float)currentBrightness / MAX_BRIGHTNESS) * MAX_LED_VALUE));
 }
 
 void changeLedIndex(byte newIndex) {
